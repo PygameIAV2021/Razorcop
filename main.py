@@ -52,7 +52,7 @@ bulletImg = pygame.image.load("bullet.png")
 bulletX = playerX
 bulletY = playerY
 bulletX_change = 0
-bulletY_change = 30
+bulletY_change = 80
 bullet_state = "ready"
 
 
@@ -106,7 +106,7 @@ while running:  # While running ist True, window stay open.
         player_down = True
 
     if keys[pygame.K_SPACE]:
-        if bullet_state is "ready":
+        if bullet_state == "ready":
             bulletX = playerX
             bullet(bulletX, bulletY)
 
@@ -128,7 +128,7 @@ while running:  # While running ist True, window stay open.
         bulletY = playerY
         bullet_state = "ready"
 
-    if bullet_state is "fire":
+    if bullet_state == "fire":
         bullet(bulletX, bulletY)
         bulletY -= bulletY_change
 
