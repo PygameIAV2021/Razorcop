@@ -6,7 +6,6 @@ import random  # movement update for enemies.
 
 pygame.init()
 # Initialize the Pygame.
-pygame.init()
 
 #  classes
 #  ----------------------------- Objects -------------------------------------
@@ -40,10 +39,21 @@ player_vel = 20
 enemyImg = pygame.image.load("Gegner.png")  # Image Loading
 enemyX = random.randint(500 - 190, 1100)  # places the x coord. for enemyImg object in the middle
 enemyY = random.randint(50, 150)  # places the y coord. for enemyImg object in the middle
-enemyX_change = 15    # New coordinate point for X
+enemyX_change = 15  # New coordinate point for X
 enemyY_change = 7  # New coordinate point for y
 enemyX_vel = 15
 enemyY_vel = 7
+
+# Bullets
+
+# Bullet1
+
+bulletImg = pygame.image.load("bullet.png")
+bulletX = playerX
+bulletY = playerY
+bulletX_change = 0
+bulletY_change = 30
+bullet_state = "ready"
 
 
 def player(x, y):
@@ -54,9 +64,14 @@ def enemy(x, y):
     screen.blit(enemyImg, (x, y))  # The term used for rendering objects is Blitting
 
 
+def bullet(x, y):
+    global bullet_state
+    bullet_state = "fire"
+    screen.blit(bulletImg, (x, y))
+
+
 # The window will close in few seconds, we need a while loop (or game loop).
 # We need also a quit function (pygame.quit)
-
 
 # Game Loop
 running = True
@@ -90,6 +105,11 @@ while running:  # While running ist True, window stay open.
         player_up = False
         player_down = True
 
+    if keys[pygame.K_SPACE]:
+        if bullet_state is "ready":
+            bulletX = playerX
+            bullet(bulletX, bulletY)
+
     enemyX += enemyX_change
     if enemyX <= 300:
         enemyX_change = enemyX_vel
@@ -102,8 +122,17 @@ while running:  # While running ist True, window stay open.
     elif enemyY >= 100:
         enemyY_change = -enemyY_vel
 
+    # bullet Movement
+
+    if bulletY <= 0:
+        bulletY = playerY
+        bullet_state = "ready"
+
+    if bullet_state is "fire":
+        bullet(bulletX, bulletY)
+        bulletY -= bulletY_change
+
     player(playerX, playerY)  # Function for Player_ship will be called here
 
     enemy(enemyX, enemyY)  # Function for Enemy  will be called here
-
     pygame.display.update()
