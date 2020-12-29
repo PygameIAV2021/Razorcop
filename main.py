@@ -5,7 +5,7 @@ import pygame
 import random
 import module as mod
 
-FPS = 30  # Frames per second
+FPS = 120  # Frames per second
 
 # initialize Pygame and create window
 

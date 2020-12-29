@@ -24,7 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()  # Coordinates for instance player
         self.rect.centerx = Screensize.width / 2
         self.rect.centery = Screensize.height - (Screensize.height / 4)
-        self.speed = 16
+        self.speed = 6
         self.speedx = 0
         self.speedy = 0
 
