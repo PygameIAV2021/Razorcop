@@ -2,6 +2,7 @@
 # Juan Jose Rodriguez Luis - 2020.
 
 import pygame
+import random
 
 
 class Screensize:
@@ -49,7 +50,7 @@ class Player(pygame.sprite.Sprite):
             self.speedy = 0
         self.rect.y += self.speedy
 
-    def create_bullet(self):  # player.create_bullet calls this funktion
+    def create_bullet(self):  # player.create_bullet calls this function
         return Bullet(self.rect.centerx, self.rect.top)
 
 
@@ -63,3 +64,22 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.y -= 12
         if self.rect.bottom < 0:  # if the bullet is beyond from the screen limits, will be delete
             self.kill()
+
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("Boss_1.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(Screensize.width - self.rect.width)
+        self.rect.y = random.randrange(-100, -40)
+        self.speedy = random.randrange(1, 5)
+        self.speedx = random.randrange(-3, 3)
+
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > Screensize.height + 10 or self.rect.left < -25 or self.rect.right > Screensize.width + 20:
+            self.rect.x = random.randrange(Screensize.width - self.rect.width)
+            self.rect.y = random.randrange(-100, -40)
+            self.speedy = random.randrange(1, 8)
