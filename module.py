@@ -32,18 +32,18 @@ class Player(pygame.sprite.Sprite):
         self.speedx = 0
         self.speedy = 0
         key_state = pygame.key.get_pressed()
-        if key_state[pygame.K_LEFT] and (self.rect.centerx > 0):
+        if key_state[pygame.K_LEFT] and (self.rect.left > 0):
             self.speedx -= self.speed
-        if key_state[pygame.K_RIGHT] and (self.rect.centerx < Screensize.width):
+        if key_state[pygame.K_RIGHT] and (self.rect.right < Screensize.width):
             self.speedx = self.speed
         if key_state[pygame.K_LEFT] and key_state[pygame.K_RIGHT]:
             self.speedx = 0
         self.rect.x += self.speedx
 
         key_state = pygame.key.get_pressed()
-        if key_state[pygame.K_UP] and (self.rect.centery > 0):
+        if key_state[pygame.K_UP] and (self.rect.top > 0):
             self.speedy -= self.speed
-        if key_state[pygame.K_DOWN] and (self.rect.centery < Screensize.height):
+        if key_state[pygame.K_DOWN] and (self.rect.bottom < Screensize.height):
             self.speedy = self.speed
         if key_state[pygame.K_UP] and key_state[pygame.K_DOWN]:
             self.speedy = 0

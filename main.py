@@ -2,7 +2,6 @@
 # Juan Jose Rodriguez Luis - 2020.
 
 import pygame
-import random
 import module as mod
 
 FPS = 120  # Frames per second
@@ -15,14 +14,19 @@ screen = pygame.display.set_mode((mod.Screensize.width, mod.Screensize.height)) 
 pygame.display.set_caption("Razorcop")  # name on the windows bar
 icon = pygame.image.load("icon_Ship.png")  # load icon image
 pygame.display.set_icon(icon)
-icon = pygame.image.load("icon_Ship.png")
 clock = pygame.time.Clock()  # create an object to help track time
 
-# Sprite Group
-all_sprites = pygame.sprite.Group()  # Object with name Group for all the sprites
-player = mod.Player()  # instantiate a class mod.Player
+# Scrolling Background
+background = pygame.image.load("BGBig1600.png").convert()  # (convert) Pygame reading optimize
+speed_background_y = 0  # background only has movement on Y axis
 
-all_sprites.add(player)  # adds sprite player to the Sprite-Group
+
+# Sprite Group
+player = mod.Player()  # adds sprite player to the Sprite-Group on module.py
+all_sprites = pygame.sprite.Group()  # Object with name Group for all the sprites like ship an enemies
+all_sprites.add()
+all_sprites.add(player)
+
 
 # Game Loop
 
@@ -38,9 +42,16 @@ while running:
 
     # Updates
     all_sprites.update()  # updates sprites
+    rel_y = speed_background_y % background.get_rect().height
+    '''dividing speed_background_y by the width and returning the remainder, Relative X now only references
+    between 0 and the width of the display surface and overlaps the empty space by updating/drawing'''
 
     # Draw / Render
-    screen.fill(mod.Colors.black)
+    screen.blit(background, (0, rel_y - background.get_rect().height))  # blit = render
+    if rel_y < mod.Screensize.height:
+        screen.blit(background, (0, rel_y))
+    speed_background_y += 0.3  #
+
     all_sprites.draw(screen)  # draws sprites group on the "screen" variable
     pygame.display.flip()  # Double Buffering refresh optimization (after drawing everything flips the display).
 
