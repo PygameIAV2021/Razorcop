@@ -48,3 +48,18 @@ class Player(pygame.sprite.Sprite):
         if key_state[pygame.K_UP] and key_state[pygame.K_DOWN]:
             self.speedy = 0
         self.rect.y += self.speedy
+
+    def create_bullet(self):  # player.create_bullet calls this funktion
+        return Bullet(self.rect.centerx, self.rect.top)
+
+
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):  # parameter from Player rect position
+        pygame.sprite.Sprite.__init__(self)  # class Sprite: simple base class for visible game objects.
+        self.image = pygame.image.load("bullet.png")
+        self.rect = self.image.get_rect(center=(pos_x, pos_y))
+
+    def update(self):  # for movements
+        self.rect.y -= 12
+        if self.rect.bottom < 0:  # if the bullet is beyond from the screen limits, will be delete
+            self.kill()

@@ -20,14 +20,13 @@ clock = pygame.time.Clock()  # create an object to help track time
 background = pygame.image.load("BGBig1600.png").convert()  # (convert) Pygame reading optimize
 speed_background_y = 0  # background only has movement on Y axis
 
-
 # Sprite Group
 player = mod.Player()  # adds sprite player to the Sprite-Group on module.py
+
 all_sprites = pygame.sprite.Group()  # Object with name Group for all the sprites like ship an enemies
-all_sprites.add()
 all_sprites.add(player)
 
-
+bullet_sprites = pygame.sprite.Group()
 # Game Loop
 
 running = True
@@ -39,9 +38,13 @@ while running:
     for event in pygame.event.get():  # track for events inside the loop (keys events per example)
         if event.type == pygame.QUIT:  # check for closing window
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                bullet_sprites.add(player.create_bullet())
 
     # Updates
-    all_sprites.update()  # updates sprites
+    all_sprites.update()  # updates sprites group
+    bullet_sprites.update()
     rel_y = speed_background_y % background.get_rect().height
     '''dividing speed_background_y by the width and returning the remainder, Relative X now only references
     between 0 and the width of the display surface and overlaps the empty space by updating/drawing'''
@@ -53,6 +56,7 @@ while running:
     speed_background_y += 0.3  #
 
     all_sprites.draw(screen)  # draws sprites group on the "screen" variable
+    bullet_sprites.draw(screen)
     pygame.display.flip()  # Double Buffering refresh optimization (after drawing everything flips the display).
 
 pygame.quit()
