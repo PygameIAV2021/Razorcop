@@ -6,8 +6,8 @@ import random
 
 
 class Screensize:
-    width = 1280
-    height = 720
+    width = 1600
+    height = 900
 
 
 class Colors:
@@ -22,9 +22,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):  # initializer can accept any number of Group instances that the Sprite will become a member of.
         pygame.sprite.Sprite.__init__(self)  # class Sprite: simple base class for visible game objects.
         self.image = pygame.image.load("Player_Ship.png")
-        self.rect = self.image.get_rect()  # Coordinates for instance player
-        self.rect.centerx = Screensize.width / 2
-        self.rect.centery = Screensize.height - (Screensize.height / 4)
+        self.rect = self.image.get_rect()  # it takes image and draws a rect around, useful to Coordinates-values-
+        self.rect.center = [Screensize.width / 2, Screensize.height - (Screensize.height / 4)]
         self.speed = 6
         self.speedx = 0
         self.speedy = 0
@@ -69,11 +68,11 @@ class Bullet(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("Boss_1.png")
+        self.image = pygame.image.load("Cangrejo.png ")
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(Screensize.width - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
-        self.speedy = random.randrange(1, 5)
+        self.speedy = random.randrange(1, 8)
         self.speedx = random.randrange(-3, 3)
 
     def update(self):
