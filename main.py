@@ -47,6 +47,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 bullet_sprites.add(player.create_bullet())
+    laser_beam = pygame.key.get_pressed()
+    if laser_beam[pygame.K_b]:
+        bullet_sprites.add(player.create_bullet())
 
     # Updates
     all_sprites.update()  # updates sprites group
@@ -56,11 +59,15 @@ while running:
     between 0 and the width of the display surface and overlaps the empty space by updating/drawing'''
 
     # check to see if a bullet hits a enemy
-    collisions = pygame.sprite.groupcollide(enemies, bullet_sprites, True, True)  # sprite groups collisions
+    collisions = pygame.sprite.groupcollide(enemies, bullet_sprites, True, True)  # to enemies sprite groups collisions
     for collision in collisions:
         enemy = mod.Enemy()
         all_sprites.add(enemy)
         enemies.add(enemy)
+
+    hits_to_player = pygame.sprite.spritecollide(player, enemies, False)  # to player simple Sprite collisions
+    if hits_to_player:
+        running = False
 
     # Draw / Render
     screen.blit(background, (0, rel_y - background.get_rect().height))  # blit = render
