@@ -86,7 +86,7 @@ while running:
     bullet_sprites.draw(screen)
 
     # Score table
-    mod.Score_text(screen, "Score: " + str(score), 24, mod.Screensize.width - 150, 30)  # Python ist schööön!!!
+    mod.score_text(screen, "Score: " + str(score), 24, mod.Screensize.width - 150, 30)  # Python ist schööön!!!
 
     # Double Buffering refresh optimization (after drawing everything flips the display).
     pygame.display.flip()

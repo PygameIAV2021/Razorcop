@@ -13,7 +13,7 @@ for i in enemies_list:
     enemies_images.append(pygame.image.load(path.join(img_dir, i)))
 
 font_name = pygame.font.match_font('verdana')
-def Score_text(surface, text, size, x, y):
+def score_text(surface, text, size, x, y):
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, Colors.white)
     text_rect = text_surface.get_rect()
