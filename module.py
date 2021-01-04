@@ -3,6 +3,22 @@
 
 import pygame
 import random
+from os import path
+
+img_dir = path.join(path.dirname(__file__), 'images')  # import images directory
+
+enemies_images = []
+enemies_list = ['Cangrejo.png', 'Pulga.png']  # for randoms enemies
+for i in enemies_list:
+    enemies_images.append(pygame.image.load(path.join(img_dir, i)))
+
+font_name = pygame.font.match_font('verdana')
+def Score_text(surface, text, size, x, y):
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(text, True, Colors.white)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surface.blit(text_surface, text_rect)
 
 
 class Screensize:
@@ -16,13 +32,16 @@ class Colors:
     red = (255, 0, 0)
     green = (0, 255, 0)
     blue = (0, 0, 255)
+    yellow = (0, 255, 255)
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):  # initializer can accept any number of Group instances that the Sprite will become a member of.
         pygame.sprite.Sprite.__init__(self)  # class Sprite: simple base class for visible game objects.
-        self.image = pygame.image.load("Player_Ship.png")
+        self.image = pygame.image.load(path.join(img_dir, "Player_Ship.png"))
         self.rect = self.image.get_rect()  # it takes image and draws a rect around, useful to Coordinates-values-
+        self.radius = int(self.rect.width * .80 / 2)  # for pygame.sprite.collide_circle
+        #   pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
         self.rect.center = [Screensize.width / 2, Screensize.height - (Screensize.height / 4)]
         self.speed = 6
         self.speedx = 0
@@ -56,8 +75,10 @@ class Player(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):  # parameter from Player rect position
         pygame.sprite.Sprite.__init__(self)  # class Sprite: simple base class for visible game objects.
-        self.image = pygame.image.load("bullet.png")
+        self.image = pygame.image.load(path.join(img_dir, "Bullet.png"))
         self.rect = self.image.get_rect(center=(pos_x, pos_y))
+        self.radius = int(self.rect.width * .30 / 2)
+        pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
 
     def update(self):  # for movements
         self.rect.y -= 12
@@ -68,17 +89,28 @@ class Bullet(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("Cangrejo.png ")
+        self.image = random.choice(enemies_images)
         self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(Screensize.width - self.rect.width)
+        self.radius = int(self.rect.width * .65 / 2)  # for pygame.sprite.collide_circle
+        #  pygame.draw.circle(self.image, Colors.green, self.rect.center, self.radius)
+        self.rect.x = random.randrange(200, Screensize.width - 200)
         self.rect.y = random.randrange(-100, -40)
-        self.speedy = random.randrange(1, 8)
-        self.speedx = random.randrange(-3, 3)
+        self.speedx = random.randrange(-2, 2)
+        self.speedy = random.randrange(2, 8)
+
+    '''def move_towards_player(self, player):
+        # Find direction vector (dx, dy) between enemy and player.
+        follow_vector = pygame.math.Vector2(player.rect.x - self.rect.x, player.rect.y - self.rect.y)
+        follow_vector.normalize()
+        # Move along this normalized vector towards the player at current speed.
+        follow_vector.scale_to_length(self.speed)
+        self.rect.move_ip(follow_vector)'''
 
     def update(self):
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.top > Screensize.height + 10 or self.rect.left < -25 or self.rect.right > Screensize.width + 20:
-            self.rect.x = random.randrange(Screensize.width - self.rect.width)
+        if self.rect.top > Screensize.height + 20 or self.rect.left < -25 or self.rect.right > Screensize.width + 20:
+            self.rect.x = random.randrange(200, Screensize.width - 200)
             self.rect.y = random.randrange(-100, -40)
-            self.speedy = random.randrange(1, 8)
+            self.speedx = random.randrange(-2, 2)
+            self.speedy = random.randrange(2, 8)
