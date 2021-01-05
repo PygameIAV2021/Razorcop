@@ -6,6 +6,7 @@ import random
 from os import path
 
 img_dir = path.join(path.dirname(__file__), 'images')  # import images directory
+snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
 
 enemies_images = []
 enemies_list = ['Cangrejo.png', 'Pulga.png']  # for randoms enemies
@@ -78,7 +79,7 @@ class Bullet(pygame.sprite.Sprite):
         self.image = pygame.image.load(path.join(img_dir, "Bullet.png"))
         self.rect = self.image.get_rect(center=(pos_x, pos_y))
         self.radius = int(self.rect.width * .30 / 2)
-        pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
+        #  pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
 
     def update(self):  # for movements
         self.rect.y -= 12

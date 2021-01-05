@@ -3,10 +3,11 @@
 
 import pygame
 import module as mod
+import random
 from os import path
 
-img_dir = path.join(path.dirname(__file__), 'images')
-
+img_dir = path.join(path.dirname(__file__), 'images')  # import images directory
+snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
 FPS = 120  # Frames per second
 
 # initialize Pygame and create window
@@ -19,6 +20,20 @@ pygame.display.set_icon(icon)
 pygame.display.set_caption("Razorcop")
 clock = pygame.time.Clock()  # create an object to help track time
 
+# load Sounds effects and music
+
+pygame.mixer.music.load(path.join(snd_dir, 'Columns_III.mp3'))
+pygame.mixer.music.set_volume(2)
+
+laser_shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser_Shoot_6.wav '))
+
+explosions_sounds = []
+explosions_sounds_list = ['Explosion_Enemy_4.wav', 'Explosion_Enemy_5.wav', 'Explosion_Enemy_6.wav']
+for explosion in explosions_sounds_list:
+    explosions_sounds.append(pygame.mixer.Sound(path.join(snd_dir, explosion)))
+#  explosion_enemy_1 = pygame.mixer.Sound(path.join(snd_dir, 'Explosion_Enemy_4.wav'))
+
+# load Scrolling Background
 background = pygame.image.load("images\BGBig1600.png").convert()  # (convert) Pygame reading optimize
 speed_background_y = 0  # background only has movement on Y axis
 
@@ -31,11 +46,12 @@ bullet_sprites = pygame.sprite.Group()
 
 # enemies
 enemies = pygame.sprite.Group()
-for e in range(4):
+for e in range( 8):
     enemy = mod.Enemy()
     all_sprites.add(enemy)
     enemies.add(enemy)  # add instance enemy to pygame.sprite.group
 score = 0
+pygame.mixer.music.play(loops=-1)  # -1 infinite, 1 = one time playback, 2 = two times playback
 
 # Game Loop
 
@@ -50,9 +66,11 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
+                laser_shoot_sound.play()
                 bullet_sprites.add(player.create_bullet())
     laser_beam = pygame.key.get_pressed()
     if laser_beam[pygame.K_b]:
+        laser_shoot_sound.play()
         bullet_sprites.add(player.create_bullet())
 
     # ------------------------------------------------ Updates --------------------------------------------------
@@ -66,6 +84,7 @@ while running:
     collisions = pygame.sprite.groupcollide(enemies, bullet_sprites, True, True, pygame.sprite.collide_circle)
     for collision in collisions:
         score += 1234
+        random.choice(explosions_sounds).play()
         enemy = mod.Enemy()
         all_sprites.add(enemy)
         enemies.add(enemy)
