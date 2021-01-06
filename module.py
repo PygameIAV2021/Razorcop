@@ -8,8 +8,9 @@ from os import path
 img_dir = path.join(path.dirname(__file__), 'images')  # import images directory
 snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
 
+# for randoms enemies
 enemies_images = []
-enemies_list = ['Cangrejo.png', 'Pulga.png']  # for randoms enemies
+enemies_list = ['Cangrejo.png', 'Pulga.png']
 for i in enemies_list:
     enemies_images.append(pygame.image.load(path.join(img_dir, i)))
 
@@ -21,6 +22,20 @@ def score_text(surface, text, size, x, y):
     text_rect.midtop = (x, y)
     surface.blit(text_surface, text_rect)
 
+def life_bar(surface, x, y, life):
+    # if life < 0:
+    # life = 0 --> debugging --> bar will not negative, because of negative length on display
+    bar_length = 200
+    bar_height = 15
+    fill = (life / 100) * bar_length
+    border_line_rect = pygame.Rect(x, y, bar_length, bar_height)
+    fill_rect = pygame.Rect(x, y, fill, bar_height)
+    pygame.draw.rect(surface, Colors.green, fill_rect)
+    if life <= 70:
+        pygame.draw.rect(surface, Colors.yellow, fill_rect)
+    if life <= 35:
+        pygame.draw.rect(surface, Colors.red, fill_rect)
+    pygame.draw.rect(surface, Colors.white, border_line_rect, 2)  # 4 = border line height
 
 class Screensize:
     width = 1600
@@ -33,7 +48,7 @@ class Colors:
     red = (255, 0, 0)
     green = (0, 255, 0)
     blue = (0, 0, 255)
-    yellow = (0, 255, 255)
+    yellow = (255, 255, 0)
 
 
 class Player(pygame.sprite.Sprite):
@@ -42,11 +57,12 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load(path.join(img_dir, "Player_Ship.png"))
         self.rect = self.image.get_rect()  # it takes image and draws a rect around, useful to Coordinates-values-
         self.radius = int(self.rect.width * .80 / 2)  # for pygame.sprite.collide_circle
-        #   pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
+        #  pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
         self.rect.center = [Screensize.width / 2, Screensize.height - (Screensize.height / 4)]
         self.speed = 6
         self.speedx = 0
         self.speedy = 0
+        self.life = 100
 
     def update(self):  # Movement speedx,y and centerx,y are from Base-class
         self.speedx = 0
@@ -92,11 +108,11 @@ class Enemy(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = random.choice(enemies_images)
         self.rect = self.image.get_rect()
-        self.radius = int(self.rect.width * .65 / 2)  # for pygame.sprite.collide_circle
+        self.radius = int(self.rect.width * .70 / 2)  # for pygame.sprite.collide_circle
         #  pygame.draw.circle(self.image, Colors.green, self.rect.center, self.radius)
-        self.rect.x = random.randrange(200, Screensize.width - 200)
+        self.rect.x = Screensize.width / 2
         self.rect.y = random.randrange(-100, -40)
-        self.speedx = random.randrange(-2, 2)
+        self.speedx = 0
         self.speedy = random.randrange(2, 8)
 
     '''def move_towards_player(self, player):
@@ -110,8 +126,12 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.top > Screensize.height + 20 or self.rect.left < -25 or self.rect.right > Screensize.width + 20:
+        if self.rect.top > Screensize.height + 50:
             self.rect.x = random.randrange(200, Screensize.width - 200)
             self.rect.y = random.randrange(-100, -40)
             self.speedx = random.randrange(-2, 2)
             self.speedy = random.randrange(2, 8)
+            if self.rect.centery <= 200:
+                self.speedy = random.randrange(2, 8)
+            if self.rect.centery > Screensize.width + 200:
+                self.speedy = random.randrange(-8, -6)
