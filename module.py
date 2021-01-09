@@ -17,14 +17,13 @@ for i in enemies_list:
 
 font_name = pygame.font.match_font('verdana')
 
-
+# -------------------------  hubs ------------------------------------------
 def score_text(surface, text, size, x, y):
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, Colors.white)
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surface.blit(text_surface, text_rect)
-
 
 def life_bar(surface, x, y, life):
     # if life < 0:
@@ -41,7 +40,15 @@ def life_bar(surface, x, y, life):
         pygame.draw.rect(surface, Colors.red, fill_rect)
     pygame.draw.rect(surface, Colors.white, border_line_rect, 2)  # 4 = border line height
 
+def lives_hub(surface, x, y, lives):
+    player_live = pygame.image.load(path.join(img_dir, "Icon_Ship.png"))
+    for num in range(lives):
+        img_rect = player_live.get_rect()
+        img_rect.x = x + 50 * num
+        img_rect.y = y
+        surface.blit(player_live, img_rect)
 
+# ----------------------- classes ------------------------------------------
 class Screensize:
     width = 1600
     height = 900
@@ -68,27 +75,41 @@ class Player(pygame.sprite.Sprite):  # class child of pygame.sprite.Sprite
         self.speedx = 0
         self.speedy = 0
         self.life = 100
+        self.lives = 3
+        self.hidden = False
+        self.hide_timer = pygame.time.get_ticks()  # time checkpoint on screen
 
     def update(self):  # Movement speedx,y and centerx,y are from Base-class
-        self.speedx = 0
-        self.speedy = 0
-        key_state = pygame.key.get_pressed()
-        if key_state[pygame.K_LEFT] and (self.rect.left > 0):
-            self.speedx -= self.speed
-        if key_state[pygame.K_RIGHT] and (self.rect.right < Screensize.width):
-            self.speedx = self.speed
-        if key_state[pygame.K_LEFT] and key_state[pygame.K_RIGHT]:
-            self.speedx = 0
-        self.rect.x += self.speedx
+        # to unhide if hidden
+        if self.hidden and pygame.time.get_ticks() - self.hide_timer > 1000:  # time while hiding
+            self.hidden = False
+            self.rect.center = [Screensize.width / 2, Screensize.height - (Screensize.height / 4)]
 
-        key_state = pygame.key.get_pressed()
-        if key_state[pygame.K_UP] and (self.rect.top > 0):
-            self.speedy -= self.speed
-        if key_state[pygame.K_DOWN] and (self.rect.bottom < Screensize.height):
-            self.speedy = self.speed
-        if key_state[pygame.K_UP] and key_state[pygame.K_DOWN]:
+        if not self.hidden:  # if the ship ist not on Screen, will not able to move
+            self.speedx = 0
             self.speedy = 0
-        self.rect.y += self.speedy
+            key_state = pygame.key.get_pressed()
+            if key_state[pygame.K_LEFT] and (self.rect.left > 0):
+                self.speedx -= self.speed
+            if key_state[pygame.K_RIGHT] and (self.rect.right < Screensize.width):
+                self.speedx = self.speed
+            if key_state[pygame.K_LEFT] and key_state[pygame.K_RIGHT]:
+                self.speedx = 0
+            self.rect.x += self.speedx
+
+            if key_state[pygame.K_UP] and (self.rect.top > 0):
+                self.speedy -= self.speed
+            if key_state[pygame.K_DOWN] and (self.rect.bottom < Screensize.height):
+                self.speedy = self.speed
+            if key_state[pygame.K_UP] and key_state[pygame.K_DOWN]:
+                self.speedy = 0
+            self.rect.y += self.speedy
+
+    def hide(self):
+        # hide the player temporarily
+        self.hidden = True
+        self.hide_timer = pygame.time.get_ticks()  # time checkpoint out from screen
+        self.rect.center = (Screensize.width / 2, Screensize.height + 300)  # set the ship out from game screen
 
     def create_bullet(self):  # player.create_bullet calls this function
         return Bullet(self.rect.centerx, self.rect.top)
@@ -107,7 +128,9 @@ class ExplosionPlayer(pygame.sprite.Sprite):
         self.counter = 0  # takes the 0 from index to counter
 
     def update(self):
-        explosion_speed = 6  # setting the rate which images update
+        explosion_speed = 10  # setting the rate which images update
+        '''Counter will reaches explosion_speed by each rate, if 
+                        explosion ist higher, Counter needs more time to reach it'''
         # update explosion animation
         self.counter += 1  # to increase at each iteration
         '''if the counter reach the end of the list, reset the counter'''
@@ -127,10 +150,10 @@ class Bullet(pygame.sprite.Sprite):
         self.radius = int(self.rect.width * .30 / 2)
         #  pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
 
-    def update(self):  # for movements
+    def update(self):
         self.rect.y -= 12
-        if self.rect.bottom < 0:  # if the bullet is beyond from the screen limits, will be delete
-            self.kill()
+        if self.rect.bottom < 0:
+            self.kill()  # if the bullet is beyond from the screen limits, will be delete
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
@@ -179,7 +202,7 @@ class ExplosionEnemies(pygame.sprite.Sprite):
         self.counter = 0  # takes the 0 from index to counter
 
     def update(self):
-        explosion_speed = 6  # setting the rate which images update
+        explosion_speed = 6  # setting the rate which images update,  1 faster than 2 and then.
         # update explosion animation
         self.counter += 1  # to increase at each iteration
         '''if the counter reach the end of the list, reset the counter'''

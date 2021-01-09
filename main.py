@@ -12,8 +12,8 @@ snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
 # ---------------------------------  initialize Pygame and create window ------------------------------------
 pygame.init()  # start pygame library
 pygame.mixer.init()  # start sounds library
-screen = pygame.display.set_mode((mod.Screensize.width, mod.Screensize.height))  # define windows and window's size
-# screen = pygame.display.set_mode((mod.Screensize.width, mod.Screensize.height), pygame.FULLSCREEN, 32)
+# screen = pygame.display.set_mode((mod.Screensize.width, mod.Screensize.height))  # define windows and window's size
+screen = pygame.display.set_mode((mod.Screensize.width, mod.Screensize.height), pygame.FULLSCREEN, 32)
 icon = pygame.image.load(path.join(img_dir, "Icon_Ship.png"))  # load icon image
 pygame.display.set_icon(icon)
 pygame.display.set_caption("Razorcop")
@@ -28,11 +28,12 @@ pygame.mixer.music.set_volume(2)
 # Razorcop sound
 laser_shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser_Shoot_6.wav '))
 laser_beam_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser_Shoot_4.wav'))
-damage_sound = pygame.mixer.Sound(path.join(snd_dir, 'Explosion_Enemy_6.wav'))
+damage_sound = pygame.mixer.Sound(path.join(snd_dir, 'Explosion_enemy_6.wav'))
+explosion_ship_sound = pygame.mixer.Sound(path.join(snd_dir, 'Explosion_Ship_3.wav'))
 alert_sound = pygame.mixer.Sound(path.join(snd_dir, 'Alert_2.wav'))
 # enemy sound
 explosions_sounds = []
-explosions_sounds_list = ['Explosion_Enemy_4.wav', 'Explosion_Enemy_5.wav', 'Explosion_Enemy_6.wav']
+explosions_sounds_list = ['Explosion_Enemy_4.wav', 'Explosion_Enemy_5.wav']
 for explosion in explosions_sounds_list:
     explosions_sounds.append(pygame.mixer.Sound(path.join(snd_dir, explosion)))
 #  explosion_enemy_1 = pygame.mixer.Sound(path.join(snd_dir, 'Explosion_Enemy_4.wav'))
@@ -74,11 +75,11 @@ while running:
         if event.type == pygame.QUIT:  # check for closing window
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE and not player.hidden:
                 laser_shoot_sound.play()
                 bullet_sprites.add(player.create_bullet())
     laser_beam = pygame.key.get_pressed()
-    if laser_beam[pygame.K_b]:
+    if laser_beam[pygame.K_b] and not player.hidden:
         laser_beam_sound.play()
         bullet_sprites.add(player.create_bullet())
 
@@ -109,24 +110,29 @@ while running:
     # to player simple Sprite collisions
     hits_to_player = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
     for hit in hits_to_player:
-        damage_sound.play()
         player.life -= 100 / 3  # 3 shoots to DIE :'(
+        if 100 > player.life > 1:
+            damage_sound.play()
         if 35 > player.life > 5:
             alert_sound.play()
         if player.life <= 0:
+            explosion_ship_sound.play()
             explosion_player = mod.ExplosionPlayer(player.rect.centerx, player.rect.centery)
             all_sprites.add(explosion_player)
+            player.hide()
+            player.lives -= 1
             player.life = 100
 
         # enemies explosion
         explosion = mod.ExplosionEnemies(hit.rect.centerx, hit.rect.centery)  # position from the collision
         all_sprites.add(explosion)
-
         # for more enemies incoming after the collision
         enemy = mod.Enemy()  # enemy die too... i need him back to the action >:(
         all_sprites.add(enemy)
         enemies.add(enemy)
-
+        # if the player died and the explosion has finished playing
+    if player.lives == 0 and not explosion_player.alive():
+        running = False
     # ----------------------------------------------- Draw / Render --------------------------------------------------
     # Scrolling Background
     screen.blit(background, (0, rel_y - background.get_rect().height))  # blit = render
@@ -140,9 +146,11 @@ while running:
     explosion_player_sprite.draw(screen)
     explosion_enemies_sprite.draw(screen)
     # Score table
-    mod.score_text(screen, "Score: " + str(score), 24, mod.Screensize.width - 150, 30)  # Python ist schööön!!!
+    mod.score_text(screen, "Score: " + str(score), 24, mod.Screensize.width - 150, 35)  # Python ist schööön!!!
     # life bar
     mod.life_bar(screen, 50, 40, player.life)
+    # Hub lives
+    mod.lives_hub(screen, 80, 70, player.lives)
     # Double Buffering refresh optimization (after drawing everything flips the display).
     pygame.display.flip()
 
