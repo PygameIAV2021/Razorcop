@@ -9,7 +9,6 @@ from os import path
 img_dir = path.join(path.dirname(__file__), 'images')  # import images directory
 snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
 
-
 # ---------------------------------  initialize Pygame and create window ------------------------------------
 pygame.init()  # start pygame library
 pygame.mixer.init()  # start sounds library
@@ -39,18 +38,23 @@ for explosion in explosions_sounds_list:
 #  explosion_enemy_1 = pygame.mixer.Sound(path.join(snd_dir, 'Explosion_Enemy_4.wav'))
 
 # --------------------------------------- load Scrolling Background ---------------------------------------
-background = pygame.image.load("images\BGBig1600.png").convert()  # (convert) Pygame reading optimize
+background = pygame.image.load("images\Background_final.png").convert()  # (convert) Pygame reading optimize
 speed_background_y = 0  # background only has movement on Y axis
 
 # -------------------------------------------- Sprite Groups  --------------------------------------------------
+'''pygame.sprite.Group() allows me to use update and move functions, 
+    that normally are inherited from the instance(sprite) class'''
+
 player = mod.Player()  # adds sprite player to the Sprite-Group on module.py
+explosion_player_sprite = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()  # Object with name Group for all the sprites like ship an enemies
 all_sprites.add(player)
 
 bullet_sprites = pygame.sprite.Group()
 
 # enemies
-enemies = pygame.sprite.Group()
+enemies = pygame.sprite.Group()  # create a enemies Sprite-Group
+explosion_enemies_sprite = pygame.sprite.Group()  # create a explosion enemies Sprite-Group
 for e in range(8):
     enemy = mod.Enemy()  # itinerant from Enemy class
     all_sprites.add(enemy)
@@ -81,6 +85,8 @@ while running:
     # ------------------------------------------------ Updates --------------------------------------------------
     all_sprites.update()  # updates sprites group
     bullet_sprites.update()
+    explosion_enemies_sprite.update()
+
     rel_y = speed_background_y % background.get_rect().height
     '''dividing speed_background_y by the width and returning the remainder, Relative X now only references
     between 0 and the width of the display surface and overlaps the empty space by updating/drawing'''
@@ -90,6 +96,12 @@ while running:
     for collision in collisions:
         score += 1234
         random.choice(explosions_sounds).play()
+        '''Madre de dios bendito, señor... Las explosiones deben ser llamadas usando la 
+            coordenada de la collision, en vez del la coordenada del objeto impactado'''
+
+        explosion = mod.ExplosionEnemies(collision.rect.centerx, collision.rect.centery)  # position from the collision
+        all_sprites.add(explosion)
+        #  create a new enemy by each collision
         enemy = mod.Enemy()
         all_sprites.add(enemy)
         enemies.add(enemy)
@@ -99,10 +111,18 @@ while running:
     for hit in hits_to_player:
         damage_sound.play()
         player.life -= 100 / 3  # 3 shoots to DIE :'(
-        if player.life < 35:
+        if 35 > player.life > 5:
             alert_sound.play()
         if player.life <= 0:
-            running = False
+            explosion_player = mod.ExplosionPlayer(player.rect.centerx, player.rect.centery)
+            all_sprites.add(explosion_player)
+            player.life = 100
+
+        # enemies explosion
+        explosion = mod.ExplosionEnemies(hit.rect.centerx, hit.rect.centery)  # position from the collision
+        all_sprites.add(explosion)
+
+        # for more enemies incoming after the collision
         enemy = mod.Enemy()  # enemy die too... i need him back to the action >:(
         all_sprites.add(enemy)
         enemies.add(enemy)
@@ -112,12 +132,13 @@ while running:
     screen.blit(background, (0, rel_y - background.get_rect().height))  # blit = render
     if rel_y < mod.Screensize.height:
         screen.blit(background, (0, rel_y))
-    speed_background_y += 1  #
+    speed_background_y += 1  # 1 pixel pro frame
 
     # draws sprites group on the "screen" variable
     all_sprites.draw(screen)
     bullet_sprites.draw(screen)
-
+    explosion_player_sprite.draw(screen)
+    explosion_enemies_sprite.draw(screen)
     # Score table
     mod.score_text(screen, "Score: " + str(score), 24, mod.Screensize.width - 150, 30)  # Python ist schööön!!!
     # life bar

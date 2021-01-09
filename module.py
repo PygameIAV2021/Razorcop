@@ -7,6 +7,7 @@ from os import path
 
 img_dir = path.join(path.dirname(__file__), 'images')  # import images directory
 snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
+ani_dir = path.join(path.dirname(__file__), 'sprite_animations')  # import sounds directory
 
 # for randoms enemies
 enemies_images = []
@@ -15,12 +16,15 @@ for i in enemies_list:
     enemies_images.append(pygame.image.load(path.join(img_dir, i)))
 
 font_name = pygame.font.match_font('verdana')
+
+
 def score_text(surface, text, size, x, y):
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, Colors.white)
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surface.blit(text_surface, text_rect)
+
 
 def life_bar(surface, x, y, life):
     # if life < 0:
@@ -37,10 +41,10 @@ def life_bar(surface, x, y, life):
         pygame.draw.rect(surface, Colors.red, fill_rect)
     pygame.draw.rect(surface, Colors.white, border_line_rect, 2)  # 4 = border line height
 
+
 class Screensize:
     width = 1600
     height = 900
-
 
 class Colors:
     white = (255, 255, 255)
@@ -50,14 +54,15 @@ class Colors:
     blue = (0, 0, 255)
     yellow = (255, 255, 0)
 
-
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):  # class child of pygame.sprite.Sprite
     def __init__(self):  # initializer can accept any number of Group instances that the Sprite will become a member of.
-        pygame.sprite.Sprite.__init__(self)  # class Sprite: simple base class for visible game objects.
+        pygame.sprite.Sprite.__init__(self)
+        # class Sprite: simple base class for visible game objects.
+        # we need to call the init from the superclass, because i created a child class for player
         self.image = pygame.image.load(path.join(img_dir, "Player_Ship.png"))
         self.rect = self.image.get_rect()  # it takes image and draws a rect around, useful to Coordinates-values-
         self.radius = int(self.rect.width * .80 / 2)  # for pygame.sprite.collide_circle
-        #  pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
+        # pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
         self.rect.center = [Screensize.width / 2, Screensize.height - (Screensize.height / 4)]
         self.speed = 6
         self.speedx = 0
@@ -88,6 +93,31 @@ class Player(pygame.sprite.Sprite):
     def create_bullet(self):  # player.create_bullet calls this function
         return Bullet(self.rect.centerx, self.rect.top)
 
+class ExplosionPlayer(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        pygame.sprite.Sprite.__init__(self)
+        self.images = []  # amazing, pycharm really take care about your grammar by programming image/images
+        for number in range(7):
+            img = pygame.image.load(path.join(ani_dir, f'ExploRazor{number}.png'))
+            self.images.append(img)  # appends to the images list
+        self.index = 0  # to get always the first picture every time a instance ist created
+        self.image = self.images[self.index]  # accessing to the image from the list
+        self.rect = self.image.get_rect()  # it takes image and draws a rect around, useful to Coordinates-values-
+        self.rect = self.image.get_rect(center=(pos_x, pos_y))  # position for the rectangle with the image on it
+        self.counter = 0  # takes the 0 from index to counter
+
+    def update(self):
+        explosion_speed = 6  # setting the rate which images update
+        # update explosion animation
+        self.counter += 1  # to increase at each iteration
+        '''if the counter reach the end of the list, reset the counter'''
+        if self.counter >= explosion_speed and self.index < len(self.images) - 1:
+            self.counter = 0
+            self.index += 1
+            self.image = self.images[self.index]
+        '''if the animation ist complete, reset the animation index'''
+        if self.index >= len(self.images) - 1 and self.counter >= explosion_speed:
+            self.kill()  # once it comes to the end of the list, kill the animation instance
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):  # parameter from Player rect position
@@ -102,17 +132,16 @@ class Bullet(pygame.sprite.Sprite):
         if self.rect.bottom < 0:  # if the bullet is beyond from the screen limits, will be delete
             self.kill()
 
-
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = random.choice(enemies_images)
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width * .70 / 2)  # for pygame.sprite.collide_circle
-        #  pygame.draw.circle(self.image, Colors.green, self.rect.center, self.radius)
-        self.rect.x = Screensize.width / 2
+        # pygame.draw.circle(self.image, Colors.green, self.rect.center, self.radius)
+        self.rect.x = random.randrange(200, Screensize.width - 200)
         self.rect.y = random.randrange(-100, -40)
-        self.speedx = 0
+        self.speedx = random.randrange(-2, 2)
         self.speedy = random.randrange(2, 8)
 
     '''def move_towards_player(self, player):
@@ -135,3 +164,29 @@ class Enemy(pygame.sprite.Sprite):
                 self.speedy = random.randrange(2, 8)
             if self.rect.centery > Screensize.width + 200:
                 self.speedy = random.randrange(-8, -6)
+
+class ExplosionEnemies(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        pygame.sprite.Sprite.__init__(self)
+        self.images = []  # amazing, pycharm really take care about your grammar by programming image/images
+        for number in range(7):
+            img = pygame.image.load(path.join(ani_dir, f'Explosiones{number}.png'))
+            self.images.append(img)  # appends to the images list
+        self.index = 0  # to get always the first picture every time a instance ist created
+        self.image = self.images[self.index]  # accessing to the image from the list
+        self.rect = self.image.get_rect()  # it takes image and draws a rect around, useful to Coordinates-values-
+        self.rect = self.image.get_rect(center=(pos_x, pos_y))  # position for the rectangle with the image on it
+        self.counter = 0  # takes the 0 from index to counter
+
+    def update(self):
+        explosion_speed = 6  # setting the rate which images update
+        # update explosion animation
+        self.counter += 1  # to increase at each iteration
+        '''if the counter reach the end of the list, reset the counter'''
+        if self.counter >= explosion_speed and self.index < len(self.images) - 1:
+            self.counter = 0
+            self.index += 1
+            self.image = self.images[self.index]
+        '''if the animation ist complete, reset the animation index'''
+        if self.index >= len(self.images) - 1 and self.counter >= explosion_speed:
+            self.kill()  # once it comes to the end of the list, kill the animation instance
