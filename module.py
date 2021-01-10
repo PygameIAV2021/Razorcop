@@ -68,9 +68,6 @@ class Screen:
     icon = pygame.image.load(path.join(img_dir, "Icon_Ship.png"))  # load icon image
     pygame.display.set_icon(icon)
     pygame.display.set_caption("Razorcop")
-    FPS = 60  # Frames per second
-    clock = pygame.time.Clock()
-
 
 class Player(pygame.sprite.Sprite, Screen):  # class child of pygame.sprite.Sprite
     def __init__(self):  # initializer can accept any number of Group instances that the Sprite will become a member of.
@@ -82,7 +79,7 @@ class Player(pygame.sprite.Sprite, Screen):  # class child of pygame.sprite.Spri
         self.radius = int(self.rect.width * .80 / 2)  # for pygame.sprite.collide_circle
         # pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
         self.rect.center = [Screen.width / 2, Screen.height - 100]
-        self.speed = 6
+        self.speed = 10
         self.speedx = 0
         self.speedy = 0
         self.life = 100
@@ -164,12 +161,12 @@ class Bullet(pygame.sprite.Sprite):
         #  pygame.draw.circle(self.image, Colors.red, self.rect.center, self.radius)
 
     def update(self):
-        self.rect.y -= 12
+        self.rect.y -= 16
         if self.rect.bottom < 0:
             self.kill()  # if the bullet is beyond from the screen limits, will be delete
 
 
-class Enemy(pygame.sprite.Sprite):
+class Enemy(pygame.sprite.Sprite, Screen):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = random.choice(enemies_images)
@@ -179,7 +176,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x = random.randrange(200, Screen.width - 200)
         self.rect.y = random.randrange(-100, -40)
         self.speedx = random.randrange(-2, 2)
-        self.speedy = random.randrange(2, 8)
+        self.speedy = random.randrange(2, 10)
 
     '''def move_towards_player(self, player):
         # Find direction vector (dx, dy) between enemy and player.
@@ -196,11 +193,7 @@ class Enemy(pygame.sprite.Sprite):
             self.rect.x = random.randrange(200, Screen.width - 200)
             self.rect.y = random.randrange(-100, -40)
             self.speedx = random.randrange(-2, 2)
-            self.speedy = random.randrange(2, 8)
-            if self.rect.centery <= 200:
-                self.speedy = random.randrange(2, 8)
-            if self.rect.centery > Screen.width + 200:
-                self.speedy = random.randrange(-8, -6)
+            self.speedy = random.randrange(2, 10)
 
 
 class ExplosionEnemies(pygame.sprite.Sprite):
@@ -217,7 +210,7 @@ class ExplosionEnemies(pygame.sprite.Sprite):
         self.counter = 0  # takes the 0 from index to counter
 
     def update(self):
-        explosion_speed = 6  # setting the rate which images update,  1 faster than 2 and then.
+        explosion_speed = 5  # setting the rate which images update,  1 faster than 2 and then.
         # update explosion animation
         self.counter += 1  # to increase at each iteration
         '''if the counter reach the end of the list, reset the counter'''

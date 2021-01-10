@@ -14,6 +14,7 @@ snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
 # ---------------------------------  initialize Pygame and create window ------------------------------------
 pygame.init()  # start pygame library
 screen = mod.Screen()
+clock = pygame.time.Clock()
 
 # --------------------------------------- load Scrolling Background ---------------------------------------
 background = pygame.image.load("images\Background_final.png").convert()  # (convert) Pygame reading optimize
@@ -47,7 +48,8 @@ score = 0
 running = True
 while running:
     # Keep loop running at the right speed
-    FPS = mod.Screen.FPS  # create object to help track time and tells pygame to figure out how long the loop took.
+    clock.tick(120)
+    # create object to help track time and tells pygame to figure out how long the loop took.
 
     # ------------------------------------------ Process input (events) -----------------------------------------------
     for event in pygame.event.get():  # track for events inside the loop (keys events per example)
@@ -57,10 +59,6 @@ while running:
             if event.key == pygame.K_SPACE and not player.hidden:
                 snd.SoundFx.laser_shoot_sound.play()
                 bullet_sprites.add(player.create_bullet())
-    laser_beam = pygame.key.get_pressed()
-    if laser_beam[pygame.K_b] and not player.hidden:
-        snd.SoundFx.laser_beam_sound.play()
-        bullet_sprites.add(player.create_bullet())
 
     # ------------------------------------------------ Updates --------------------------------------------------
     all_sprites.update()  # updates sprites group
@@ -75,8 +73,7 @@ while running:
     for collision in collisions:
         score += 1234
         random.choice(snd.SoundFx.enemy_explosions_sounds).play()
-        '''Madre de dios bendito, señor... Las explosiones deben ser llamadas usando la 
-            coordenada de la collision, en vez del la coordenada del objeto impactado'''
+        '''Las explosiones deben ser llamadas usando la coordenada de la collision, no la del objeto impactado'''
 
         explosion = mod.ExplosionEnemies(collision.rect.centerx, collision.rect.centery)  # position from the collision
         all_sprites.add(explosion)
