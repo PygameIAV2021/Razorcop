@@ -11,10 +11,11 @@ from os import path
 img_dir = path.join(path.dirname(__file__), 'images')  # import images directory
 snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
 
+
 # ---------------------------------  initialize Pygame and create window ------------------------------------
 pygame.init()  # start pygame library
 screen = mod.Screen()
-clock = pygame.time.Clock()
+clock = pygame.time.Clock()  # set the game to the right speed
 
 # --------------------------------------- load Scrolling Background ---------------------------------------
 background = pygame.image.load("images\Background_final.png").convert()  # (convert) Pygame reading optimize
@@ -35,26 +36,31 @@ all_sprites.add(player)
 bullet_sprites = pygame.sprite.Group()
 
 # enemies
-enemies = pygame.sprite.Group()  # create a enemies Sprite-Group
+enemies_sprites = pygame.sprite.Group()  # create a enemies Sprite-Group
 explosion_enemies_sprite = pygame.sprite.Group()  # create a explosion enemies Sprite-Group
 for e in range(8):
     enemy = mod.Enemy()  # itinerant from Enemy class
     all_sprites.add(enemy)  # init itinerant to update
-    enemies.add(enemy)  # add instance enemy to pygame.sprite.group to use .draw
+    enemies_sprites.add(enemy)  # add instance enemy to pygame.sprite.group to use .draw
 
 score = 0
 # -------- Game Loop --------- Game Loop --------- Game Loop --------- Game Loop --------- Game Loop -------- Game Loop
-
+snd.music()
+game_over = True
 running = True
-while running:
-    # Keep loop running at the right speed
-    clock.tick(120)
-    # create object to help track time and tells pygame to figure out how long the loop took.
 
+while running:
+    if game_over:
+        mod.main_menu_screen(screen.display)
+        game_over = False
+
+    clock.tick(120)  # Keep loop running at the right speed
+    # create object to help track time and tells pygame to figure out how long the loop took.
     # ------------------------------------------ Process input (events) -----------------------------------------------
     for event in pygame.event.get():  # track for events inside the loop (keys events per example)
         if event.type == pygame.QUIT:  # check for closing window
             running = False
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and not player.hidden:
                 snd.SoundFx.laser_shoot_sound.play()
@@ -69,7 +75,7 @@ while running:
     between 0 and the width of the display surface and overlaps the empty space by updating/drawing'''
 
     # check to see if a bullet hits a enemy / enemies sprite groups collisions
-    collisions = pygame.sprite.groupcollide(enemies, bullet_sprites, True, True, pygame.sprite.collide_circle)
+    collisions = pygame.sprite.groupcollide(enemies_sprites, bullet_sprites, True, True, pygame.sprite.collide_circle)
     for collision in collisions:
         score += 1234
         random.choice(snd.SoundFx.enemy_explosions_sounds).play()
@@ -80,10 +86,10 @@ while running:
         #  create a new enemy by each collision
         enemy = mod.Enemy()  # enemy die too... i need him back to the action >:(
         all_sprites.add(enemy)  # to see them on the screen
-        enemies.add(enemy)  # refresh to get properties from them
+        enemies_sprites.add(enemy)  # refresh to get properties from them
 
     # to player simple Sprite collisions
-    hits_to_player = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
+    hits_to_player = pygame.sprite.spritecollide(player, enemies_sprites, True, pygame.sprite.collide_circle)
     for hit in hits_to_player:
         player.life -= 100 / 3  # 3 shoots to DIE :'(
         if 100 > player.life > 1:
@@ -104,11 +110,13 @@ while running:
         # for more enemies incoming after the collision
         enemy = mod.Enemy()  # enemy die too... i need him back to the action >:(
         all_sprites.add(enemy)  # to see them on the screen
-        enemies.add(enemy)  # refresh to get properties from them
+        enemies_sprites.add(enemy)  # refresh to get properties from them
         # if the player died and the explosion has finished playing
     if player.lives == 0 and not explosion_player.alive():
-        running = False
+        game_over = True
+        player.lives = 3
     # ----------------------------------------------- Draw / Render --------------------------------------------------
+    # Press start Menu
     # Scrolling Background
     screen.display.blit(background, (0, rel_y - background.get_rect().height))  # blit = render
     if rel_y < screen.height:
@@ -121,9 +129,9 @@ while running:
     explosion_player_sprite.draw(screen.display)
     explosion_enemies_sprite.draw(screen.display)
     # Score table
-    mod.score_text(screen.display, "Score: " + str(score), 24, screen.width - 150, 35)  # Python ist schööön!!!
+    mod.draw_text(screen.display, "Score: " + str(score), 40, screen.width - 150, 35)  # Python ist schööön!!!
     # life bar
-    mod.life_bar(screen.display, 50, 40, player.life)
+    mod.life_bar(screen.display, 60, 40, player.life)
     # Hub lives
     mod.lives_hub(screen.display, 80, 70, player.lives)
     # Double Buffering refresh optimization (after drawing everything flips the display).

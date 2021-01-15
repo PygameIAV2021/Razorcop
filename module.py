@@ -7,6 +7,8 @@ from os import path
 
 img_dir = path.join(path.dirname(__file__), 'images')  # import images directory
 ani_dir = path.join(path.dirname(__file__), 'sprite_animations')  # import sounds directory
+fnt_dir = path.join(path.dirname(__file__), 'fonts')  # import fonts
+hsc_dir = path.join(path.dirname(__file__), 'highscore')  # import highscore folder
 
 # for randoms enemies
 enemies_images = []
@@ -14,12 +16,20 @@ enemies_list = ['Cangrejo.png', 'Pulga.png']
 for i in enemies_list:
     enemies_images.append(pygame.image.load(path.join(img_dir, i)))
 
-font_name = pygame.font.match_font('verdana')
+
+# ------------------------- High Score data load --------------------------
+def load_data_score(self):
+    # load high score
+    with open(path.join(hsc_dir, 'highscore.txt'), 'r') as f:
+        try:
+            self.highscore = int(f.read())
+        except:
+            self.highscore = 0
 
 
 # -------------------------  hubs ------------------------------------------
-def score_text(surface, text, size, x, y):
-    font = pygame.font.Font(font_name, size)
+def draw_text(surface, text, size, x, y):
+    font = pygame.font.Font(path.join(fnt_dir, "VerminVibes1989Regular.ttf"), size)
     text_surface = font.render(text, True, Colors.white)
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
@@ -50,7 +60,33 @@ def lives_hub(surface, x, y, lives):
         img_rect.y = y
         surface.blit(player_live, img_rect)
 
-# ----------------------- classes ------------------------------------------
+
+# ----------------------- Main Menu ---------------------------------------
+def main_menu_screen(self, surface):
+    background = pygame.image.load(path.join(img_dir, 'BGBig1600.png'))
+    background_rect = background.get_rect()
+    surface.blit(background, background_rect)
+    self.draw_text(surface, "RAZORCOP", 200, Screen.width / 2, Screen.height / 4)
+    self.draw_text(surface, "Arrow keys move, Space to fire", 60, Screen.width / 2, Screen.height / 2)
+    self.draw_text(surface, "Press any key to begin", 50, Screen.width / 2, Screen.height * 3 / 4)
+    self.draw_text("High Score: " + str(self.highscore), 22, Screen.height, Screen.width / 2, 15)
+    pygame.display.flip()
+    waiting = True
+    clock = pygame.time.Clock()
+
+    while waiting:
+        clock.tick(120)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYUP:
+                waiting = False
+
+# ----------------------------------- Game over ------------------------------------
+
+
+# ----------------------- classes -------------------------------------------------
+
 class Colors:
     white = (255, 255, 255)
     black = (0, 0, 0)
@@ -68,6 +104,7 @@ class Screen:
     icon = pygame.image.load(path.join(img_dir, "Icon_Ship.png"))  # load icon image
     pygame.display.set_icon(icon)
     pygame.display.set_caption("Razorcop")
+
 
 class Player(pygame.sprite.Sprite, Screen):  # class child of pygame.sprite.Sprite
     def __init__(self):  # initializer can accept any number of Group instances that the Sprite will become a member of.
@@ -176,7 +213,7 @@ class Enemy(pygame.sprite.Sprite, Screen):
         self.rect.x = random.randrange(200, Screen.width - 200)
         self.rect.y = random.randrange(-100, -40)
         self.speedx = random.randrange(-2, 2)
-        self.speedy = random.randrange(2, 10)
+        self.speedy = random.randrange(2, 4)
 
     '''def move_towards_player(self, player):
         # Find direction vector (dx, dy) between enemy and player.
@@ -193,7 +230,7 @@ class Enemy(pygame.sprite.Sprite, Screen):
             self.rect.x = random.randrange(200, Screen.width - 200)
             self.rect.y = random.randrange(-100, -40)
             self.speedx = random.randrange(-2, 2)
-            self.speedy = random.randrange(2, 10)
+            self.speedy = random.randrange(2, 4)
 
 
 class ExplosionEnemies(pygame.sprite.Sprite):
@@ -204,20 +241,20 @@ class ExplosionEnemies(pygame.sprite.Sprite):
             img = pygame.image.load(path.join(ani_dir, f'Explosiones{number}.png'))
             self.images.append(img)  # appends to the images list
         self.index = 0  # to get always the first picture every time a instance ist created
-        self.image = self.images[self.index]  # accessing to the image from the list
+        self.image = self.images[self.index]  # accessing to the first image from the list
         self.rect = self.image.get_rect()  # it takes image and draws a rect around, useful to Coordinates-values-
         self.rect = self.image.get_rect(center=(pos_x, pos_y))  # position for the rectangle with the image on it
         self.counter = 0  # takes the 0 from index to counter
 
     def update(self):
-        explosion_speed = 5  # setting the rate which images update,  1 faster than 2 and then.
+        explosion_speed = 4  # setting the rate which images update,  1 faster than 2 and then. Images repeats 5 times
         # update explosion animation
-        self.counter += 1  # to increase at each iteration
-        '''if the counter reach the end of the list, reset the counter'''
+        self.counter += 1  # to increase at each iteration to select images from the list
+        '''if the counter reach the end of the list, update + 1 > len -1'''
         if self.counter >= explosion_speed and self.index < len(self.images) - 1:
             self.counter = 0
-            self.index += 1
-            self.image = self.images[self.index]
+            self.index += 1  # for the access to the next image from the list
+            self.image = self.images[self.index]  #
         '''if the animation ist complete, reset the animation index'''
-        if self.index >= len(self.images) - 1 and self.counter >= explosion_speed:
-            self.kill()  # once it comes to the end of the list, kill the animation instance
+        if self.index >= len(self.images) - 1:
+            self.kill()  # once it comes to the end of the list, deletes the animation instance

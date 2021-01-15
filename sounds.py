@@ -9,7 +9,7 @@ pygame.mixer.init()    # start sounds library
 snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
 
 # Razorcop sound
-class Music:
+def music():
     pygame.mixer.music.load(path.join(snd_dir, 'Columns_III.mp3'))
     pygame.mixer.music.set_volume(1)
     pygame.mixer.music.play(loops=-1)  # -1 infinite playback
