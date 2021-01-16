@@ -43,16 +43,26 @@ for e in range(8):
     all_sprites.add(enemy)  # init itinerant to update
     enemies_sprites.add(enemy)  # add instance enemy to pygame.sprite.group to use .draw
 
+# -- data --
 score = 0
 # -------- Game Loop --------- Game Loop --------- Game Loop --------- Game Loop --------- Game Loop -------- Game Loop
 snd.music()
-game_over = True
+start_game = True
+game_over = False
 running = True
 
 while running:
     if game_over:
-        mod.main_menu_screen(screen.display)
+        mod.game_over_screen(screen.display, score)
+        start_game = True
         game_over = False
+
+    if start_game:
+        mod.main_screen(screen.display)
+        start_game = False
+        player.lives = 3
+        player.life = 100
+        score = 0
 
     clock.tick(120)  # Keep loop running at the right speed
     # create object to help track time and tells pygame to figure out how long the loop took.
@@ -103,6 +113,8 @@ while running:
             player.hide()
             player.lives -= 1
             player.life = 100
+            if player.lives == 0:
+                player.life = 0
 
         # enemies explosion
         explosion = mod.ExplosionEnemies(hit.rect.centerx, hit.rect.centery)  # position from the collision
@@ -114,7 +126,7 @@ while running:
         # if the player died and the explosion has finished playing
     if player.lives == 0 and not explosion_player.alive():
         game_over = True
-        player.lives = 3
+
     # ----------------------------------------------- Draw / Render --------------------------------------------------
     # Press start Menu
     # Scrolling Background
@@ -133,7 +145,7 @@ while running:
     # life bar
     mod.life_bar(screen.display, 60, 40, player.life)
     # Hub lives
-    mod.lives_hub(screen.display, 80, 70, player.lives)
+    mod.lives_hub(screen.display, 90, 70, player.lives)
     # Double Buffering refresh optimization (after drawing everything flips the display).
     pygame.display.flip()
 
