@@ -80,7 +80,7 @@ def game_over_screen(surface, score):
         draw_text(surface, "Press ENTER to continue", 50, Screen.width / 2, Screen.height - Screen.height / 5)
     if 20000 < score < 50000:
         draw_text(surface, "GAME OVER", 200, Screen.width / 2, Screen.height / 4)
-        draw_text(surface, "Common, you can do it better!", 100, Screen.width / 2, Screen.height / 2)
+        draw_text(surface, "Come on, you can do it better!", 100, Screen.width / 2, Screen.height / 2)
         draw_text(surface, "Your score: " + str(score), 50, Screen.width / 2, Screen.height - Screen.height / 4)
         draw_text(surface, "Press ENTER to continue", 50, Screen.width / 2, Screen.height - Screen.height / 5)
     if 50000 < score < 100000:
