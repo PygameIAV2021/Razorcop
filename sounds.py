@@ -5,18 +5,26 @@
 import pygame
 from os import path
 
-pygame.mixer.init()    # start sounds library
+pygame.mixer.init()  # start sounds library
 snd_dir = path.join(path.dirname(__file__), 'sounds')  # import sounds directory
 
+
 # Razorcop sound
-def music():
-    pygame.mixer.music.load(path.join(snd_dir, 'Columns_III.mp3'))
-    pygame.mixer.music.set_volume(1)
-    pygame.mixer.music.play(loops=-1)  # -1 infinite playback
+class Music:
+    def __init__(self):
+        pygame.mixer.music.load(path.join(snd_dir, 'Columns_III.mp3'))
+        pygame.mixer.music.set_volume(1)
+        pygame.mixer.music.play(loops=-1)  # -1 infinite playback
+        self.pause = False
+        if self.pause:
+            pygame.mixer.music.pause()
+        else:
+            pygame.mixer.music.unpause()
+
 
 class SoundFx:
     # Player's sound
-    laser_shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser_Shoot_6.wav '))
+    laser_shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser_Shoot_6.wav'))
     pygame.mixer.Sound.set_volume(laser_shoot_sound, 0.7)
     laser_beam_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser_Shoot_4.wav'))
     pygame.mixer.Sound.set_volume(laser_beam_sound, 0.2)

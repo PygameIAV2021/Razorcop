@@ -47,14 +47,14 @@ def lives_hub(surface, x, y, lives):
         img_rect.y = y
         surface.blit(player_live, img_rect)
 
-# ----------------------- Main Menu ---------------------------------------
+# ----------------------- Main Screen ---------------------------------------
 def main_screen(surface):
     background = pygame.image.load(path.join(img_dir, 'BGBig1600.png'))
     background_rect = background.get_rect()
     surface.blit(background, background_rect)
-    draw_text(surface, "RAZORCOP", 200, Screen.width / 2, Screen.height / 4)
-    draw_text(surface, "Arrow keys to move, Space to fire", 60, Screen.width / 2, Screen.height / 2)
-    draw_text(surface, "Press enter to begin", 50, Screen.width / 2, Screen.height * 3 / 4)
+    draw_text(surface, "RAZORCOP", 220, Screen.width / 2, Screen.height / 4)
+    draw_text(surface, "Press enter to begin", 70, Screen.width / 2, Screen.height / 2 + 200)
+    draw_text(surface, "Arrow keys to move, Space to fire", 30, Screen.width / 2, Screen.height - 100)
     pygame.display.flip()
     waiting = True
     clock = pygame.time.Clock()
@@ -67,8 +67,22 @@ def main_screen(surface):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     waiting = False
+# ----------------------------------- pause screen ---------------------------------------
+def pause_screen(surface):
+    draw_text(surface, "PAUSE", 150, Screen.width / 2, (Screen.height / 2) - 70)
+    pygame.display.flip()
+    waiting = True
+    clock = pygame.time.Clock()
 
-# ----------------------------------- Game over ------------------------------------
+    while waiting:
+        clock.tick(120)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    waiting = False
+# ----------------------------------- Game over screen ------------------------------------
 def game_over_screen(surface, score):
     background = pygame.image.load(path.join(img_dir, 'BGBig1600.png'))
     background_rect = background.get_rect()
@@ -130,7 +144,7 @@ class Screen:
     pygame.display.set_icon(icon)
     pygame.display.set_caption("Razorcop")
 
-class Player(pygame.sprite.Sprite, Screen):  # class child of pygame.sprite.Sprite
+class Player(pygame.sprite.Sprite, Screen):   # class child of pygame.sprite.Sprite
     def __init__(self):  # initializer can accept any number of Group instances that the Sprite will become a member of.
         pygame.sprite.Sprite.__init__(self)
         # class Sprite: simple base class for visible game objects.
@@ -235,14 +249,6 @@ class Enemy(pygame.sprite.Sprite, Screen):
         self.rect.y = random.randrange(-100, -40)
         self.speedx = random.randrange(-2, 2)
         self.speedy = random.randrange(2, 4)
-
-    '''def move_towards_player(self, player):
-        # Find direction vector (dx, dy) between enemy and player.
-        follow_vector = pygame.math.Vector2(player.rect.x - self.rect.x, player.rect.y - self.rect.y)
-        follow_vector.normalize()
-        # Move along this normalized vector towards the player at current speed.
-        follow_vector.scale_to_length(self.speed)
-        self.rect.move_ip(follow_vector)'''
 
     def update(self):
         self.rect.x += self.speedx

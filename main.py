@@ -46,17 +46,22 @@ for e in range(8):
 # -- data --
 score = 0
 # -------- Game Loop --------- Game Loop --------- Game Loop --------- Game Loop --------- Game Loop -------- Game Loop
-snd.music()
+
+running = True
 start_game = True
 game_over = False
-running = True
+pause = False
+music = snd.Music()
 
 while running:
+    if pause:
+        mod.pause_screen(screen.display)
+        pause = False
     if game_over:
         mod.game_over_screen(screen.display, score)
         start_game = True
         game_over = False
-
+        pause = False
     if start_game:
         mod.main_screen(screen.display)
         start_game = False
@@ -70,8 +75,9 @@ while running:
     for event in pygame.event.get():  # track for events inside the loop (keys events per example)
         if event.type == pygame.QUIT:  # check for closing window
             running = False
-
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                pause = True
             if event.key == pygame.K_SPACE and not player.hidden:
                 snd.SoundFx.laser_shoot_sound.play()
                 bullet_sprites.add(player.create_bullet())
@@ -126,7 +132,6 @@ while running:
         # if the player died and the explosion has finished playing
     if player.lives == 0 and not explosion_player.alive():
         game_over = True
-
     # ----------------------------------------------- Draw / Render --------------------------------------------------
     # Press start Menu
     # Scrolling Background
@@ -148,5 +153,6 @@ while running:
     mod.lives_hub(screen.display, 90, 70, player.lives)
     # Double Buffering refresh optimization (after drawing everything flips the display).
     pygame.display.flip()
+
 
 pygame.quit()
