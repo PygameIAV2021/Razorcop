@@ -87,29 +87,35 @@ def game_over_screen(surface, score):
     background = pygame.image.load(path.join(img_dir, 'BGBig1600.png'))
     background_rect = background.get_rect()
     surface.blit(background, background_rect)
-    if score < 20000:
+    if score < 50000:
         draw_text(surface, "GAME OVER", 200, Screen.width / 2, Screen.height / 4)
         draw_text(surface, "YOU ARE DEAD", 120, Screen.width / 2, Screen.height / 2)
         draw_text(surface, "Your score: " + str(score), 50, Screen.width / 2, Screen.height - Screen.height / 4)
         draw_text(surface, "Press ENTER to continue", 50, Screen.width / 2, Screen.height - Screen.height / 5)
-    if 20000 < score < 50000:
+    if 50000 <= score < 100000:
         draw_text(surface, "GAME OVER", 200, Screen.width / 2, Screen.height / 4)
         draw_text(surface, "Come on, you can do it better!", 100, Screen.width / 2, Screen.height / 2)
         draw_text(surface, "Your score: " + str(score), 50, Screen.width / 2, Screen.height - Screen.height / 4)
         draw_text(surface, "Press ENTER to continue", 50, Screen.width / 2, Screen.height - Screen.height / 5)
-    if 50000 < score < 100000:
+    if 100000 <= score < 200000:
         draw_text(surface, "GAME OVER", 200, Screen.width / 2, Screen.height / 4)
-        draw_text(surface, "NICE HIGHSCORE!!!", 130, Screen.width / 2, Screen.height / 2)
+        draw_text(surface, "NICE HIGHSCORE!", 130, Screen.width / 2, Screen.height / 2)
         draw_text(surface, "Your score: " + str(score), 50, Screen.width / 2, Screen.height - Screen.height / 4)
         draw_text(surface, "Press ENTER to continue", 50, Screen.width / 2, Screen.height - Screen.height / 5)
-    if 100000 < score < 150000:
+    if 200000 <= score < 500000:
         draw_text(surface, "GAME OVER", 200, Screen.width / 2, Screen.height / 4)
         draw_text(surface, "THAT WAS AMAZING!!!", 130, Screen.width / 2, Screen.height / 2)
         draw_text(surface, "Your score: " + str(score), 50, Screen.width / 2, Screen.height - Screen.height / 4)
         draw_text(surface, "Press ENTER to continue", 50, Screen.width / 2, Screen.height - Screen.height / 5)
-    if 150000 < score < 200000:
+    if 500000 <= score < 1000000:
         draw_text(surface, "GAME OVER", 200, Screen.width / 2, Screen.height / 4)
-        draw_text(surface, "YOU ARE UNBELIEVABLE!!!", 140, Screen.width / 2, Screen.height / 2)
+        draw_text(surface, "YOU ALMOST SAVED THE EARTH!", 100, Screen.width / 2, Screen.height / 2)
+        draw_text(surface, "Your score: " + str(score), 50, Screen.width / 2, Screen.height - Screen.height / 4)
+        draw_text(surface, "Press ENTER to continue", 50, Screen.width / 2, Screen.height - Screen.height / 5)
+    if score >= 1000000:
+        draw_text(surface, "YOU SAVED THE EARTH", 150, Screen.width / 2, Screen.height / 4)
+        draw_text(surface, "Your sacrifice in the battle against the aliens",  70, Screen.width / 2, Screen.height / 2)
+        draw_text(surface, "has made you the HERO of the Galaxy.", 70, Screen.width / 2, (Screen.height / 2) + 50)
         draw_text(surface, "Your score: " + str(score), 50, Screen.width / 2, Screen.height - Screen.height / 4)
         draw_text(surface, "Press ENTER to continue", 50, Screen.width / 2, Screen.height - Screen.height / 5)
     pygame.display.flip()

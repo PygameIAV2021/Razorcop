@@ -138,7 +138,7 @@ while running:
     screen.display.blit(background, (0, rel_y - background.get_rect().height))  # blit = render
     if rel_y < screen.height:
         screen.display.blit(background, (0, rel_y))
-    speed_background_y += 1  # 1 pixel pro frame
+    speed_background_y += 1  # 2 pixels pro frame
 
     # draws sprites group on the "screen" variable
     all_sprites.draw(screen.display)
